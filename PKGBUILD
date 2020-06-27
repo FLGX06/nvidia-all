@@ -256,6 +256,11 @@ prepare() {
     PATH=${CUSTOM_GCC_PATH}/bin:${CUSTOM_GCC_PATH}/lib:${CUSTOM_GCC_PATH}/include:${PATH}
   fi
 
+  # Use selected compression if defined in config but do not overwrite existing environment value if it already exists
+  if [ -n "$_compression" -a -z "${PKGEXT}" ]; then
+    export PKGEXT=".pkg.tar.$_compression"
+  fi
+
   # Extract
   msg2 "Self-Extracting $_pkg.run..."
   sh "$_pkg".run -x
@@ -268,7 +273,7 @@ prepare() {
   if [[ $pkgver = 440.26 ]]; then
     sed -i -e 's|$CC $CFLAGS -c conftest_headers$$.c|LC_ALL=C $CC $CFLAGS -c conftest_headers$$.c|g' kernel/conftest.sh
   fi
-  
+
   # 440.58.01 Unfrogging
   if [[ $pkgver = 440.58.01 ]]; then
     sed -i -e '/bug/d' nvidia-application-profiles-440.58.01-rc
